@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eliminar Datos - AgroApp</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 40px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .subtitle {
+      color: #7f8c8d;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .info-box {
+      background: #e8f4f8;
+      border-left: 4px solid #3498db;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 4px;
+    }
+
+    .info-box h3 {
+      color: #2c3e50;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .info-box p {
+      color: #34495e;
+      margin-bottom: 10px;
+    }
+
+    .data-types {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+    }
+
+    .data-types h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+
+    .data-category {
+      margin-bottom: 15px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin-right: 10px;
+      margin-top: 4px;
+    }
+
+    .checkbox-group label {
+      margin-bottom: 0;
+      font-weight: normal;
+      color: #555;
+    }
+
+    .checkbox-group .description {
+      color: #7f8c8d;
+      font-size: 14px;
+      display: block;
+      margin-top: 3px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #2c3e50;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #3498db;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+    }
+
+    .btn-primary:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #95a5a6;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .success-message {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .footer-text {
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+
+    .footer-text a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 25px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <div class="logo-icon">🗑️</div>
+      <h1>Eliminar Datos de AgroApp</h1>
+      <p class="subtitle">Gestiona la información que guardamos sobre ti</p>
+    </div>
+
+    <div class="info-box">
+      <h3>ℹ️ Información importante</h3>
+      <p>Puedes solicitar la eliminación de datos específicos sin cerrar tu cuenta. Tu cuenta permanecerá activa, pero perderás acceso a la información seleccionada.</p>
+      <p><strong>Nota:</strong> Esta acción puede tomar hasta 30 días en completarse.</p>
+    </div>
+
+    <form id="deleteDataForm">
+      <div class="data-types">
+        <h3>Selecciona los datos que deseas eliminar:</h3>
+        
+        <div class="data-category">
+          <div class="checkbox-group">
+            <input type="checkbox" id="trees" name="dataTypes" value="trees">
+            <label for="trees">
+              Árboles y plantaciones
+              <span class="description">Registros de árboles, ubicaciones GPS, fechas de cultivo</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="data-category">
+          <div class="checkbox-group">
+            <input type="checkbox" id="production" name="dataTypes" value="production">
+            <label for="production">
+              Datos de producción
+              <span class="description">Cosechas, rendimientos, proyecciones</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="data-category">
+          <div class="checkbox-group">
+            <input type="checkbox" id="treatments" name="dataTypes" value="treatments">
+            <label for="treatments">
+              Tratamientos y riegos
+              <span class="description">Historial de fertilización, fumigación, riego</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="data-category">
+          <div class="checkbox-group">
+            <input type="checkbox" id="financial" name="dataTypes" value="financial">
+            <label for="financial">
+              Información financiera
+              <span class="description">Gastos, costos, ventas, presupuestos</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="data-category">
+          <div class="checkbox-group">
+            <input type="checkbox" id="tasks" name="dataTypes" value="tasks">
+            <label for="tasks">
+              Tareas y recordatorios
+              <span class="description">Calendario, tareas programadas, alertas</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="data-category">
+          <div class="checkbox-group">
+            <input type="checkbox" id="allData" name="dataTypes" value="all">
+            <label for="allData">
+              <strong>Todos mis datos</strong>
+              <span class="description">Eliminar toda la información excepto email y contraseña</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email registrado en AgroApp *</label>
+        <input type="email" id="email" name="email" required placeholder="tu@email.com">
+      </div>
+
+      <div class="form-group">
+        <label for="reason">Motivo de la eliminación (opcional)</label>
+        <textarea id="reason" name="reason" placeholder="Cuéntanos por qué deseas eliminar estos datos..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+        Solicitar eliminación de datos
+      </button>
+
+      <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+        Cancelar y volver
+      </button>
+    </form>
+
+    <div id="successMessage" class="success-message">
+      <div class="success-icon">✓</div>
+      <h3>Solicitud recibida</h3>
+      <p>Tu solicitud de eliminación de datos ha sido recibida. Procesaremos tu petición en un plazo máximo de 30 días. Recibirás una confirmación por email cuando el proceso esté completo.</p>
+    </div>
+
+    <p class="footer-text">
+      ¿Prefieres eliminar tu cuenta completa? <a href="eliminar-cuenta-agroapp.html">Eliminar cuenta</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    // Configuración de Firebase (usa tu configuración)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDm_DenNbuG-zLS-8tupO8BZEpfo5z3MY8",
+      authDomain: "fincalaherradura-c5229.firebaseapp.com",
+      projectId: "fincalaherradura-c5229",
+      storageBucket: "fincalaherradura-c5229.firebasestorage.app",
+      messagingSenderId: "453253173599",
+      appId: "1:453253173599:web:f5f31e55fc1a93e7f5a6ea"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById('deleteDataForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const checkboxes = document.querySelectorAll('input[name="dataTypes"]');
+    const successMessage = document.getElementById('successMessage');
+    const allDataCheckbox = document.getElementById('allData');
+
+    // Habilitar botón cuando se seleccione al menos un checkbox
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        submitBtn.disabled = !anyChecked;
+
+        // Si se marca "todos mis datos", desmarcar los demás
+        if (this.id === 'allData' && this.checked) {
+          checkboxes.forEach(cb => {
+            if (cb.id !== 'allData') cb.checked = false;
+          });
+        } else if (this.checked && this.id !== 'allData') {
+          allDataCheckbox.checked = false;
+        }
+      });
+    });
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const selectedData = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+      const formData = {
+        email: document.getElementById('email').value,
+        dataTypes: selectedData,
+        reason: document.getElementById('reason').value,
+        timestamp: serverTimestamp(),
+        status: 'pending',
+        type: 'delete_data'
+      };
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Procesando...';
+
+        await addDoc(collection(db, 'data_deletion_requests'), formData);
+
+        form.style.display = 'none';
+        successMessage.classList.add('show');
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Hubo un error al procesar tu solicitud. Por favor, intenta nuevamente o contacta a soporte@nadrika.com');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Solicitar eliminación de datos';
+      }
+    });
+  </script>
+</body>
+</html>
