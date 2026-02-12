@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NADRIKA — Arquitectura SaaS para LATAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0B0F19;
+  --bg-secondary: #111827;
+  --bg-card: rgba(17, 24, 39, 0.6);
+  --accent: #3B82F6;
+  --accent-glow: #6366F1;
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --border: rgba(255,255,255,0.06);
+  --glass: rgba(255,255,255,0.03);
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== UTILITIES ===== */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.section { padding: 8rem 0; position: relative; }
+.mono { font-family: 'Space Mono', monospace; }
+.accent { color: var(--accent); }
+.glow-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes lineGrow {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.animate-in { animation: fadeInUp 0.8s ease-out forwards; }
+.animate-in-delay-1 { animation: fadeInUp 0.8s ease-out 0.15s forwards; opacity: 0; }
+.animate-in-delay-2 { animation: fadeInUp 0.8s ease-out 0.3s forwards; opacity: 0; }
+.animate-in-delay-3 { animation: fadeInUp 0.8s ease-out 0.45s forwards; opacity: 0; }
+.animate-in-delay-4 { animation: fadeInUp 0.8s ease-out 0.6s forwards; opacity: 0; }
+
+/* ===== NOISE OVERLAY ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 1200px;
+  z-index: 100;
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  background: rgba(11, 15, 25, 0.75);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.85rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeIn 1s ease-out;
+}
+.navbar-logo {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.25em;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.navbar-links { display: flex; gap: 2.5rem; align-items: center; }
+.navbar-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  transition: color 0.3s;
+}
+.navbar-links a:hover { color: var(--text-primary); }
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-primary:hover {
+  background: #2563EB;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-secondary:hover {
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.03);
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-top: 6rem;
+}
+.hero-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: glowPulse 6s ease-in-out infinite;
+  pointer-events: none;
+}
+.hero-bg-orb-1 {
+  top: 15%;
+  left: 10%;
+  width: 500px;
+  height: 500px;
+  background: rgba(59, 130, 246, 0.08);
+}
+.hero-bg-orb-2 {
+  bottom: 10%;
+  right: 5%;
+  width: 400px;
+  height: 400px;
+  background: rgba(99, 102, 241, 0.06);
+  animation-delay: 3s;
+}
+.hero-content { position: relative; z-index: 2; max-width: 800px; }
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 100px;
+  background: rgba(59, 130, 246, 0.05);
+}
+.hero-tag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+.hero h1 {
+  font-size: clamp(2.8rem, 5.5vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+.hero p {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+  line-height: 1.8;
+  font-weight: 400;
+}
+.hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+/* ===== GRID PATTERN ===== */
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black, transparent);
+  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black, transparent);
+  pointer-events: none;
+}
+
+/* ===== DIVIDER ===== */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+/* ===== PHILOSOPHY ===== */
+.philosophy-header {
+  max-width: 700px;
+  margin-bottom: 4rem;
+}
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+  display: block;
+}
+.section-title {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.2rem;
+}
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 600px;
+}
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.principle-item {
+  padding: 2.5rem;
+  background: var(--bg-primary);
+  transition: background 0.4s;
+}
+.principle-item:hover { background: var(--bg-secondary); }
+.principle-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+}
+.principle-item h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.01em;
+}
+.principle-item p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ===== PLATFORMS ===== */
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.platform-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+.platform-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.platform-card:hover {
+  border-color: rgba(59, 130, 246, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.platform-card:hover::before { opacity: 1; }
+.platform-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--accent);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  margin-bottom: 1.5rem;
+}
+.platform-card h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  letter-spacing: -0.02em;
+}
+.platform-card .desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.platform-features {
+  list-style: none;
+  margin-bottom: 2rem;
+}
+.platform-features li {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  padding: 0.4rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.platform-features li::before {
+  content: '→';
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+.btn-card {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: gap 0.3s;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.btn-card:hover { gap: 0.8rem; }
+
+/* ===== CUSTOM DEVELOPMENT ===== */
+.custom-dev { background: var(--bg-secondary); }
+.custom-dev-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+.custom-dev-content { max-width: 500px; }
+.custom-dev-list {
+  list-style: none;
+  margin-top: 2rem;
+}
+.custom-dev-list li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color 0.3s;
+}
+.custom-dev-list li:hover { color: var(--text-primary); }
+.custom-dev-list li .num {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--accent);
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  min-width: 2rem;
+  text-align: center;
+}
+.custom-dev-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.code-block {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 2;
+  color: var(--text-secondary);
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  overflow: hidden;
+}
+.code-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+}
+.code-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+.code-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.code-dots span:nth-child(1) { background: #EF4444; }
+.code-dots span:nth-child(2) { background: #F59E0B; }
+.code-dots span:nth-child(3) { background: #10B981; }
+.code-line { display: block; }
+.code-keyword { color: var(--accent-glow); }
+.code-string { color: #34D399; }
+.code-comment { color: #4B5563; }
+
+/* ===== ARCHITECTURE ===== */
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+.arch-item {
+  padding: 2.5rem;
+  background: var(--bg-primary);
+  transition: background 0.3s;
+}
+.arch-item:hover { background: rgba(17, 24, 39, 0.5); }
+.arch-item h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.arch-item .tech-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: block;
+}
+.arch-item p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ===== PROCESS ===== */
+.process-section { background: var(--bg-secondary); }
+.process-track {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4rem;
+  position: relative;
+}
+.process-track::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-glow), var(--accent));
+  opacity: 0.3;
+}
+.process-step {
+  text-align: center;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+.process-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s;
+}
+.process-step:hover .process-number {
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+}
+.process-step h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.process-step p {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  max-width: 140px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ===== CTA ===== */
+.cta-section {
+  text-align: center;
+  padding: 10rem 0;
+  position: relative;
+  overflow: hidden;
+}
+.cta-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+  pointer-events: none;
+}
+.cta-section h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+.cta-section p {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+.btn-large {
+  background: var(--accent);
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+}
+.btn-large:hover {
+  background: #2563EB;
+  box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  padding: 3rem 0;
+  border-top: 1px solid var(--border);
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-brand h3 {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  margin-bottom: 0.4rem;
+}
+.footer-brand p {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.footer-right {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.footer-right a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ===== PHONE MOCKUPS ===== */
+.phone-showcase {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.phone-showcase::-webkit-scrollbar { display: none; }
+.phone-frame {
+  flex-shrink: 0;
+  width: 120px;
+  height: 240px;
+  border-radius: 16px;
+  border: 2px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+  scroll-snap-align: start;
+  transition: all 0.4s ease;
+  position: relative;
+  background: #000;
+}
+.phone-frame:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: scale(1.05);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
+  z-index: 2;
+}
+.phone-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.showcase-label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.showcase-label::before {
+  content: '';
+  width: 16px;
+  height: 1px;
+  background: var(--accent);
+}
+
+/* Expanded card for AquaControl */
+.platform-card.has-showcase {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+.platform-card.has-showcase .card-content { /* text side */ }
+.platform-card.has-showcase .card-visual { /* screenshots side */ }
+
+@media (max-width: 900px) {
+  .platform-card.has-showcase {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .phone-frame { width: 100px; height: 200px; }
+}
+
+/* ===== MOBILE NAV ===== */
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+.nav-toggle span { display: block; width: 20px; height: 2px; background: var(--text-primary); margin: 4px 0; transition: all 0.3s; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .navbar-links { display: none; }
+  .nav-toggle { display: block; }
+  .custom-dev-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .arch-grid { grid-template-columns: 1fr; }
+  .process-track { flex-direction: column; gap: 2rem; align-items: flex-start; }
+  .process-track::before { display: none; }
+  .process-step { text-align: left; display: flex; align-items: center; gap: 1.5rem; }
+  .process-number { margin-bottom: 0; flex-shrink: 0; }
+  .process-step p { margin: 0; }
+  .footer-inner { flex-direction: column; text-align: center; gap: 1.5rem; }
+  .footer-right { text-align: center; }
+  .hero h1 { font-size: 2.4rem; }
+  .platforms-grid { grid-template-columns: 1fr; }
+  .principles-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <a href="#" class="navbar-logo">NADRIKA</a>
+  <div class="navbar-links">
+    <a href="#filosofia">Filosofía</a>
+    <a href="#plataformas">Plataformas</a>
+    <a href="#desarrollo">Desarrollo</a>
+    <a href="#arquitectura">Stack</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#contacto" class="btn-primary">Agendar Consultoría</a>
+  </div>
+  <button class="nav-toggle" onclick="document.querySelector('.navbar-links').style.display = document.querySelector('.navbar-links').style.display === 'flex' ? 'none' : 'flex'">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-bg-orb hero-bg-orb-1"></div>
+  <div class="hero-bg-orb hero-bg-orb-2"></div>
+  <div class="grid-bg"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag animate-in">Boutique Tecnológica — Guatemala</div>
+      <h1 class="animate-in-delay-1">
+        Arquitectura SaaS para empresas que piensan <span class="glow-text">en grande.</span>
+      </h1>
+      <p class="animate-in-delay-2">
+        Diseñamos y desarrollamos plataformas digitales escalables con infraestructura moderna y visión estratégica.
+      </p>
+      <div class="hero-buttons animate-in-delay-3">
+        <a href="#contacto" class="btn-primary">Agendar Consultoría Estratégica →</a>
+        <a href="#plataformas" class="btn-secondary">Explorar Plataformas</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PHILOSOPHY ===== -->
+<section class="section" id="filosofia">
+  <div class="container">
+    <div class="philosophy-header">
+      <span class="section-label">Filosofía</span>
+      <h2 class="section-title">No desarrollamos aplicaciones.<br><span class="glow-text">Diseñamos infraestructura.</span></h2>
+      <p class="section-desc">
+        En Nadrika creemos que una plataforma debe nacer con visión de escalabilidad, seguridad y monetización. Cada decisión técnica es una decisión de negocio.
+      </p>
+    </div>
+    <div class="principles-grid">
+      <div class="principle-item">
+        <div class="principle-icon">◇</div>
+        <h3>Arquitectura antes que interfaz</h3>
+        <p>Los cimientos son invisibles pero sostienen todo. Primero definimos la estructura, después la experiencia.</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-icon">↗</div>
+        <h3>Escalabilidad desde el día uno</h3>
+        <p>Cada componente está diseñado para crecer sin necesidad de reescribir. La arquitectura lo permite.</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-icon">⊞</div>
+        <h3>Multi-tenant nativo</h3>
+        <p>Plataformas que sirven a múltiples empresas desde una sola instancia. Aislamiento, seguridad y eficiencia.</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-icon">⚡</div>
+        <h3>Infraestructura serverless</h3>
+        <p>Sin servidores que mantener. Escalamiento automático, costos proporcionales al uso real.</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-icon">◫</div>
+        <h3>Diseño modular</h3>
+        <p>Módulos independientes que se activan según las necesidades de cada cliente. Flexibilidad total.</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-icon">⊘</div>
+        <h3>Cero dependencias innecesarias</h3>
+        <p>Stack limpio, sin bloat. Solo herramientas que agregan valor real al producto final.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===== PLATFORMS ===== -->
+<section class="section" id="plataformas">
+  <div class="container">
+    <span class="section-label">Plataformas</span>
+    <h2 class="section-title">Plataformas desarrolladas</h2>
+    <p class="section-desc">Soluciones SaaS completas, listas para producción, con arquitectura multi-tenant y diseño modular.</p>
+    
+    <div class="platforms-grid">
+      <div class="platform-card has-showcase">
+        <div class="card-content">
+          <span class="platform-badge">Multi-tenant · Logística</span>
+          <h3>AquaControl</h3>
+          <p class="desc">Sistema de gestión integral para purificadoras de agua. Reemplaza los cuadernos con una plataforma que controla rutas, ventas, créditos, gastos y comisiones desde cualquier dispositivo.</p>
+          <ul class="platform-features">
+            <li>Dashboard ejecutivo con métricas en tiempo real</li>
+            <li>Ventas al contado y crédito con cobros pendientes</li>
+            <li>Producción, inventario y materias primas</li>
+            <li>Gastos, donaciones y rutas de reparto</li>
+            <li>Precios por tipo de cliente (A, B, C)</li>
+            <li>Multi-sucursal · PWA instalable</li>
+          </ul>
+          <button class="btn-card">Solicitar Acceso →</button>
+        </div>
+        <div class="card-visual">
+          <div class="phone-showcase">
+            <div class="phone-frame"><img src="aqua-5.png" alt="AquaControl Dashboard" loading="lazy"></div>
+            <div class="phone-frame"><img src="aqua-2.png" alt="AquaControl Módulos" loading="lazy"></div>
+            <div class="phone-frame"><img src="aqua-1.png" alt="AquaControl Productos" loading="lazy"></div>
+            <div class="phone-frame"><img src="aqua-4.png" alt="AquaControl Donaciones" loading="lazy"></div>
+            <div class="phone-frame"><img src="aqua-6.png" alt="AquaControl Gastos" loading="lazy"></div>
+          </div>
+          <p class="showcase-label">Capturas reales de la plataforma en producción</p>
+        </div>
+      </div>
+      
+      <div class="platform-card has-showcase">
+        <div class="card-content">
+          <span class="platform-badge">PWA · Servicios</span>
+          <h3>Salones de Belleza</h3>
+          <p class="desc">Plataforma de administración integral para salones de belleza. Agenda, comandas, cobros, comisiones y paquetes prepagados — todo centralizado y accesible desde cualquier dispositivo.</p>
+          <ul class="platform-features">
+            <li>Dashboard ejecutivo con ingresos en tiempo real</li>
+            <li>Agenda de citas por bloques y walk-ins</li>
+            <li>Comandas con subtotales, propinas y estados</li>
+            <li>Inventario de productos por categoría y stock</li>
+            <li>Gestión de gastos mensual con promedios</li>
+            <li>Comisiones y liquidaciones por estilista</li>
+          </ul>
+          <button class="btn-card">Solicitar Acceso →</button>
+        </div>
+        <div class="card-visual">
+          <div class="phone-showcase">
+            <div class="phone-frame"><img src="salon-1.png" alt="Salón Dashboard" loading="lazy"></div>
+            <div class="phone-frame"><img src="salon-2.png" alt="Salón Citas" loading="lazy"></div>
+            <div class="phone-frame"><img src="salon-3.png" alt="Salón Comandas" loading="lazy"></div>
+            <div class="phone-frame"><img src="salon-4.png" alt="Salón Productos" loading="lazy"></div>
+            <div class="phone-frame"><img src="salon-5.png" alt="Salón Gastos" loading="lazy"></div>
+          </div>
+          <p class="showcase-label">Capturas reales — Elua Salón en producción</p>
+        </div>
+      </div>
+      
+      <div class="platform-card has-showcase">
+        <div class="card-content">
+          <span class="platform-badge">Multi-tenant · PWA</span>
+          <h3>Distribuidora SaaS</h3>
+          <p class="desc">Sistema profesional para distribuidoras y mayoristas. Gestión completa de ventas, inventario, créditos, entregas con GPS, planillas y reportes exportables — instalable directo en el celular.</p>
+          <ul class="platform-features">
+            <li>Dashboard con ventas, créditos y gráfica de tendencia</li>
+            <li>Inventario con múltiples presentaciones y alertas</li>
+            <li>Ventas al contado y crédito con detalle por cliente</li>
+            <li>Reportes exportables a Excel y PDF</li>
+            <li>Planillas con salarios, puestos y pagos</li>
+            <li>Multi-empresa · PWA instalable</li>
+          </ul>
+          <button class="btn-card">Solicitar Acceso →</button>
+        </div>
+        <div class="card-visual">
+          <div class="phone-showcase">
+            <div class="phone-frame"><img src="dist-1.png" alt="Distribuidora Dashboard" loading="lazy"></div>
+            <div class="phone-frame"><img src="dist-2.png" alt="Distribuidora Inventario" loading="lazy"></div>
+            <div class="phone-frame"><img src="dist-3.png" alt="Distribuidora Ventas" loading="lazy"></div>
+            <div class="phone-frame"><img src="dist-4.png" alt="Distribuidora Reportes" loading="lazy"></div>
+            <div class="phone-frame"><img src="dist-5.png" alt="Distribuidora Planillas" loading="lazy"></div>
+          </div>
+          <p class="showcase-label">Capturas reales de Distribuidora en producción</p>
+        </div>
+      </div>
+      
+      <div class="platform-card has-showcase">
+        <div class="card-content">
+          <span class="platform-badge">Fintech · Guatemala</span>
+          <h3>WalletApp</h3>
+          <p class="desc">Billetera digital para el mercado guatemalteco. Envíos P2P instantáneos en Quetzales, con verificación por PIN, notificaciones en tiempo real y controles de cumplimiento regulatorio integrados.</p>
+          <ul class="platform-features">
+            <li>Balance en tiempo real con límites visibles</li>
+            <li>Envíos instantáneos con 0% comisión</li>
+            <li>PIN SHA-256 y verificación de email</li>
+            <li>Panel admin: usuarios, saldos y transacciones</li>
+            <li>Límites regulatorios configurables por usuario</li>
+            <li>Dark theme nativo · Disponibilidad 24/7</li>
+          </ul>
+          <button class="btn-card">Solicitar Acceso →</button>
+        </div>
+        <div class="card-visual">
+          <div class="phone-showcase">
+            <div class="phone-frame"><img src="wallet-1.png" alt="WalletApp Home" loading="lazy"></div>
+            <div class="phone-frame"><img src="wallet-2.png" alt="WalletApp Wallet" loading="lazy"></div>
+            <div class="phone-frame"><img src="wallet-3.png" alt="WalletApp Perfil" loading="lazy"></div>
+            <div class="phone-frame"><img src="wallet-4.png" alt="WalletApp Admin Transacciones" loading="lazy"></div>
+            <div class="phone-frame"><img src="wallet-5.png" alt="WalletApp Admin Usuarios" loading="lazy"></div>
+          </div>
+          <p class="showcase-label">Capturas reales de WalletApp en producción</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CUSTOM DEVELOPMENT ===== -->
+<section class="section custom-dev" id="desarrollo">
+  <div class="container">
+    <div class="custom-dev-grid">
+      <div class="custom-dev-content">
+        <span class="section-label">Desarrollo a Medida</span>
+        <h2 class="section-title">Desarrollo boutique<br><span class="glow-text">a medida.</span></h2>
+        <p class="section-desc">
+          Trabajamos con un número limitado de empresas para diseñar arquitecturas SaaS personalizadas, sólidas y listas para escalar.
+        </p>
+        <ul class="custom-dev-list">
+          <li><span class="num">01</span> SaaS empresariales</li>
+          <li><span class="num">02</span> Dashboards de alto rendimiento</li>
+          <li><span class="num">03</span> Sistemas logísticos</li>
+          <li><span class="num">04</span> MVP Fintech</li>
+          <li><span class="num">05</span> Infraestructura multiempresa</li>
+        </ul>
+      </div>
+      <div class="custom-dev-visual">
+        <div class="code-block">
+          <div class="code-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <code>
+            <span class="code-line"><span class="code-comment">// Arquitectura Nadrika</span></span>
+            <span class="code-line"><span class="code-keyword">const</span> platform = {</span>
+            <span class="code-line">  tenant: <span class="code-string">'multi'</span>,</span>
+            <span class="code-line">  scale: <span class="code-string">'serverless'</span>,</span>
+            <span class="code-line">  auth: <span class="code-string">'role_based'</span>,</span>
+            <span class="code-line">  modules: <span class="code-string">'dynamic'</span>,</span>
+            <span class="code-line">  deploy: <span class="code-string">'continuous'</span>,</span>
+            <span class="code-line">};</span>
+            <span class="code-line">&nbsp;</span>
+            <span class="code-line"><span class="code-keyword">export</span> <span class="code-keyword">default</span> platform;</span>
+          </code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARCHITECTURE ===== -->
+<section class="section" id="arquitectura">
+  <div class="container">
+    <span class="section-label">Stack Tecnológico</span>
+    <h2 class="section-title">Infraestructura moderna,<br><span class="glow-text">diseñada para crecer.</span></h2>
+    <p class="section-desc">Cada herramienta en nuestro stack fue elegida estratégicamente. No seguimos tendencias: elegimos robustez.</p>
+    
+    <div class="arch-grid">
+      <div class="arch-item">
+        <span class="tech-tag mono">REACT 18</span>
+        <h4>Interfaces Reactivas</h4>
+        <p>Componentes modulares con renderizado eficiente. Concurrent features para experiencias fluidas bajo carga.</p>
+      </div>
+      <div class="arch-item">
+        <span class="tech-tag mono">FIREBASE</span>
+        <h4>Backend Serverless</h4>
+        <p>Autenticación, base de datos en tiempo real y hosting. Sin servidores, sin DevOps, escalamiento automático.</p>
+      </div>
+      <div class="arch-item">
+        <span class="tech-tag mono">FIRESTORE</span>
+        <h4>Base de Datos NoSQL</h4>
+        <p>Queries optimizadas con índices compuestos. Datos desnormalizados para lecturas ultra-rápidas.</p>
+      </div>
+      <div class="arch-item">
+        <span class="tech-tag mono">SECURITY RULES</span>
+        <h4>Seguridad por Roles</h4>
+        <p>Reglas granulares a nivel de documento. Aislamiento de datos por empresa. Zero-trust por defecto.</p>
+      </div>
+      <div class="arch-item">
+        <span class="tech-tag mono">MODULAR</span>
+        <h4>Arquitectura de Módulos</h4>
+        <p>Cada funcionalidad es un módulo independiente que se activa o desactiva sin afectar el sistema core.</p>
+      </div>
+      <div class="arch-item">
+        <span class="tech-tag mono">MULTI-TENANT</span>
+        <h4>Multiempresa Nativo</h4>
+        <p>Un deployment, múltiples clientes. Cada empresa opera en su propio espacio aislado y seguro.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===== PROCESS ===== -->
+<section class="section process-section" id="proceso">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <span class="section-label">Proceso</span>
+    </div>
+    <h2 class="section-title" style="text-align: center;">Nuestro proceso</h2>
+    
+    <div class="process-track">
+      <div class="process-step">
+        <div class="process-number">01</div>
+        <div>
+          <h4>Estrategia</h4>
+          <p>Definimos objetivos de negocio y alcance técnico</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-number">02</div>
+        <div>
+          <h4>Arquitectura</h4>
+          <p>Diseñamos la estructura de datos y sistemas</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-number">03</div>
+        <div>
+          <h4>Desarrollo</h4>
+          <p>Construimos con código limpio y modular</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-number">04</div>
+        <div>
+          <h4>Implementación</h4>
+          <p>Deploy, testing y puesta en producción</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-number">05</div>
+        <div>
+          <h4>Escalamiento</h4>
+          <p>Crecimiento continuo y módulos nuevos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section" id="contacto">
+  <div class="cta-glow"></div>
+  <div class="container">
+    <h2>Si tu empresa necesita una<br>plataforma real, <span class="glow-text">hablemos.</span></h2>
+    <p>Consultoría estratégica sin compromiso. Evaluamos tu proyecto y definimos el camino técnico.</p>
+    <a href="/cdn-cgi/l/email-protection#f0989f9c91b09e919482999b91de939f9d" class="btn-large">Agendar Consultoría Privada →</a>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>NADRIKA</h3>
+        <p>Boutique tecnológica especializada en arquitectura SaaS.<br>Guatemala — LATAM</p>
+      </div>
+      <div class="footer-right">
+        <p>© 2026 Nadrika. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== SCROLL ANIMATIONS ===== -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animation = 'fadeInUp 0.7s ease-out forwards';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.principle-item, .platform-card, .arch-item, .proce
