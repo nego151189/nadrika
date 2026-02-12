@@ -682,48 +682,91 @@ body::before {
   text-decoration: none;
 }
 
-/* ===== PHONE MOCKUPS ===== */
-.phone-showcase {
-  display: flex;
-  gap: 1.5rem;
-  margin: 2rem 0;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-  scroll-snap-type: x mandatory;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.phone-showcase::-webkit-scrollbar { display: none; }
-.phone-frame {
-  flex-shrink: 0;
-  width: 380px;
-  height: 760px;
-  border-radius: 24px;
-  border: 3px solid rgba(255,255,255,0.1);
-  overflow: hidden;
-  scroll-snap-align: start;
-  transition: all 0.4s ease;
+/* ===== CAROUSEL SHOWCASE ===== */
+.phone-carousel {
   position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 2rem auto 0;
+}
+.phone-carousel-track {
+  position: relative;
+  width: 100%;
+  height: 580px;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 3px solid rgba(255,255,255,0.1);
   background: #000;
 }
-.phone-frame:hover {
-  border-color: rgba(59, 130, 246, 0.3);
-  transform: scale(1.05);
-  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
-  z-index: 2;
-}
-.phone-frame img {
+.phone-carousel-track img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
-.showcase-label {
-  font-size: 0.68rem;
-  color: var(--text-secondary);
-  margin-top: 0.5rem;
+.phone-carousel-track img.active { opacity: 1; }
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.8);
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 5;
   display: flex;
   align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+.carousel-btn:hover {
+  background: var(--accent);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-50%) scale(1.1);
+}
+.carousel-btn.prev { left: -18px; }
+.carousel-btn.next { right: -18px; }
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1rem;
+}
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+.carousel-dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  width: 24px;
+  border-radius: 4px;
+}
+
+.showcase-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 0.4rem;
 }
 .showcase-label::before {
@@ -733,23 +776,34 @@ body::before {
   background: var(--accent);
 }
 
-/* Expanded card for AquaControl */
+/* Platform card with showcase */
 .platform-card.has-showcase {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
-  align-items: start;
+  gap: 3rem;
+  align-items: center;
 }
 .platform-card.has-showcase .card-content { /* text side */ }
-.platform-card.has-showcase .card-visual { /* screenshots side */ }
+.platform-card.has-showcase .card-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Alternate layout: even cards flip the order */
+.platform-card.has-showcase:nth-child(even) .card-content { order: 2; }
+.platform-card.has-showcase:nth-child(even) .card-visual { order: 1; }
 
 @media (max-width: 900px) {
   .platform-card.has-showcase {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 2rem;
   }
-  .phone-frame { width: 280px; height: 560px; }
+  .platform-card.has-showcase:nth-child(even) .card-content { order: 1; }
+  .platform-card.has-showcase:nth-child(even) .card-visual { order: 2; }
+  .phone-carousel { max-width: 280px; }
+  .phone-carousel-track { height: 500px; border-radius: 24px; }
 }
 
 /* ===== MOBILE NAV ===== */
@@ -886,12 +940,23 @@ body::before {
           <button class="btn-card">Solicitar Acceso →</button>
         </div>
         <div class="card-visual">
-          <div class="phone-showcase">
-            <div class="phone-frame"><img src="aqua-5.png" alt="AquaControl Dashboard" loading="lazy"></div>
-            <div class="phone-frame"><img src="aqua-2.png" alt="AquaControl Módulos" loading="lazy"></div>
-            <div class="phone-frame"><img src="aqua-1.png" alt="AquaControl Productos" loading="lazy"></div>
-            <div class="phone-frame"><img src="aqua-4.png" alt="AquaControl Donaciones" loading="lazy"></div>
-            <div class="phone-frame"><img src="aqua-6.png" alt="AquaControl Gastos" loading="lazy"></div>
+          <div class="phone-carousel" data-carousel="aqua">
+            <div class="phone-carousel-track">
+              <img src="aqua-5.png" alt="AquaControl Dashboard" class="active">
+              <img src="aqua-2.png" alt="AquaControl Módulos">
+              <img src="aqua-1.png" alt="AquaControl Productos">
+              <img src="aqua-4.png" alt="AquaControl Donaciones">
+              <img src="aqua-6.png" alt="AquaControl Gastos">
+            </div>
+            <button class="carousel-btn prev" onclick="moveCarousel('aqua',-1)">‹</button>
+            <button class="carousel-btn next" onclick="moveCarousel('aqua',1)">›</button>
+            <div class="carousel-dots">
+              <button class="carousel-dot active" onclick="goToSlide('aqua',0)"></button>
+              <button class="carousel-dot" onclick="goToSlide('aqua',1)"></button>
+              <button class="carousel-dot" onclick="goToSlide('aqua',2)"></button>
+              <button class="carousel-dot" onclick="goToSlide('aqua',3)"></button>
+              <button class="carousel-dot" onclick="goToSlide('aqua',4)"></button>
+            </div>
           </div>
           <p class="showcase-label">Capturas reales de la plataforma en producción</p>
         </div>
@@ -913,12 +978,23 @@ body::before {
           <button class="btn-card">Solicitar Acceso →</button>
         </div>
         <div class="card-visual">
-          <div class="phone-showcase">
-            <div class="phone-frame"><img src="salon-1.png" alt="Salón Dashboard" loading="lazy"></div>
-            <div class="phone-frame"><img src="salon-2.png" alt="Salón Citas" loading="lazy"></div>
-            <div class="phone-frame"><img src="salon-3.png" alt="Salón Comandas" loading="lazy"></div>
-            <div class="phone-frame"><img src="salon-4.png" alt="Salón Productos" loading="lazy"></div>
-            <div class="phone-frame"><img src="salon-5.png" alt="Salón Gastos" loading="lazy"></div>
+          <div class="phone-carousel" data-carousel="salon">
+            <div class="phone-carousel-track">
+              <img src="salon-1.png" alt="Salón Dashboard" class="active">
+              <img src="salon-2.png" alt="Salón Citas">
+              <img src="salon-3.png" alt="Salón Comandas">
+              <img src="salon-4.png" alt="Salón Productos">
+              <img src="salon-5.png" alt="Salón Gastos">
+            </div>
+            <button class="carousel-btn prev" onclick="moveCarousel('salon',-1)">‹</button>
+            <button class="carousel-btn next" onclick="moveCarousel('salon',1)">›</button>
+            <div class="carousel-dots">
+              <button class="carousel-dot active" onclick="goToSlide('salon',0)"></button>
+              <button class="carousel-dot" onclick="goToSlide('salon',1)"></button>
+              <button class="carousel-dot" onclick="goToSlide('salon',2)"></button>
+              <button class="carousel-dot" onclick="goToSlide('salon',3)"></button>
+              <button class="carousel-dot" onclick="goToSlide('salon',4)"></button>
+            </div>
           </div>
           <p class="showcase-label">Capturas reales — Elua Salón en producción</p>
         </div>
@@ -940,12 +1016,23 @@ body::before {
           <button class="btn-card">Solicitar Acceso →</button>
         </div>
         <div class="card-visual">
-          <div class="phone-showcase">
-            <div class="phone-frame"><img src="dist-1.png" alt="Distribuidora Dashboard" loading="lazy"></div>
-            <div class="phone-frame"><img src="dist-2.png" alt="Distribuidora Inventario" loading="lazy"></div>
-            <div class="phone-frame"><img src="dist-3.png" alt="Distribuidora Ventas" loading="lazy"></div>
-            <div class="phone-frame"><img src="dist-4.png" alt="Distribuidora Reportes" loading="lazy"></div>
-            <div class="phone-frame"><img src="dist-5.png" alt="Distribuidora Planillas" loading="lazy"></div>
+          <div class="phone-carousel" data-carousel="dist">
+            <div class="phone-carousel-track">
+              <img src="dist-1.png" alt="Distribuidora Dashboard" class="active">
+              <img src="dist-2.png" alt="Distribuidora Inventario">
+              <img src="dist-3.png" alt="Distribuidora Ventas">
+              <img src="dist-4.png" alt="Distribuidora Reportes">
+              <img src="dist-5.png" alt="Distribuidora Planillas">
+            </div>
+            <button class="carousel-btn prev" onclick="moveCarousel('dist',-1)">‹</button>
+            <button class="carousel-btn next" onclick="moveCarousel('dist',1)">›</button>
+            <div class="carousel-dots">
+              <button class="carousel-dot active" onclick="goToSlide('dist',0)"></button>
+              <button class="carousel-dot" onclick="goToSlide('dist',1)"></button>
+              <button class="carousel-dot" onclick="goToSlide('dist',2)"></button>
+              <button class="carousel-dot" onclick="goToSlide('dist',3)"></button>
+              <button class="carousel-dot" onclick="goToSlide('dist',4)"></button>
+            </div>
           </div>
           <p class="showcase-label">Capturas reales de Distribuidora en producción</p>
         </div>
@@ -967,12 +1054,23 @@ body::before {
           <button class="btn-card">Solicitar Acceso →</button>
         </div>
         <div class="card-visual">
-          <div class="phone-showcase">
-            <div class="phone-frame"><img src="wallet-1.png" alt="WalletApp Home" loading="lazy"></div>
-            <div class="phone-frame"><img src="wallet-2.png" alt="WalletApp Wallet" loading="lazy"></div>
-            <div class="phone-frame"><img src="wallet-3.png" alt="WalletApp Perfil" loading="lazy"></div>
-            <div class="phone-frame"><img src="wallet-4.png" alt="WalletApp Admin Transacciones" loading="lazy"></div>
-            <div class="phone-frame"><img src="wallet-5.png" alt="WalletApp Admin Usuarios" loading="lazy"></div>
+          <div class="phone-carousel" data-carousel="wallet">
+            <div class="phone-carousel-track">
+              <img src="wallet-1.png" alt="WalletApp Home" class="active">
+              <img src="wallet-2.png" alt="WalletApp Wallet">
+              <img src="wallet-3.png" alt="WalletApp Perfil">
+              <img src="wallet-4.png" alt="WalletApp Admin Transacciones">
+              <img src="wallet-5.png" alt="WalletApp Admin Usuarios">
+            </div>
+            <button class="carousel-btn prev" onclick="moveCarousel('wallet',-1)">‹</button>
+            <button class="carousel-btn next" onclick="moveCarousel('wallet',1)">›</button>
+            <div class="carousel-dots">
+              <button class="carousel-dot active" onclick="goToSlide('wallet',0)"></button>
+              <button class="carousel-dot" onclick="goToSlide('wallet',1)"></button>
+              <button class="carousel-dot" onclick="goToSlide('wallet',2)"></button>
+              <button class="carousel-dot" onclick="goToSlide('wallet',3)"></button>
+              <button class="carousel-dot" onclick="goToSlide('wallet',4)"></button>
+            </div>
           </div>
           <p class="showcase-label">Capturas reales de WalletApp en producción</p>
         </div>
@@ -1140,9 +1238,43 @@ body::before {
 </footer>
 
 <!-- ===== SCROLL ANIMATIONS ===== -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+<script>
+  // Carousel state
+  const carouselState = {};
+
+  function moveCarousel(id, dir) {
+    const carousel = document.querySelector('[data-carousel="'+id+'"]');
+    const imgs = carousel.querySelectorAll('.phone-carousel-track img');
+    const dots = carousel.querySelectorAll('.carousel-dot');
+    if (!carouselState[id]) carouselState[id] = 0;
+    imgs[carouselState[id]].classList.remove('active');
+    dots[carouselState[id]].classList.remove('active');
+    carouselState[id] = (carouselState[id] + dir + imgs.length) % imgs.length;
+    imgs[carouselState[id]].classList.add('active');
+    dots[carouselState[id]].classList.add('active');
+  }
+
+  function goToSlide(id, index) {
+    const carousel = document.querySelector('[data-carousel="'+id+'"]');
+    const imgs = carousel.querySelectorAll('.phone-carousel-track img');
+    const dots = carousel.querySelectorAll('.carousel-dot');
+    if (!carouselState[id]) carouselState[id] = 0;
+    imgs[carouselState[id]].classList.remove('active');
+    dots[carouselState[id]].classList.remove('active');
+    carouselState[id] = index;
+    imgs[carouselState[id]].classList.add('active');
+    dots[carouselState[id]].classList.add('active');
+  }
+
+  // Auto-rotate
+  ['aqua','salon','dist','wallet'].forEach(function(id) {
+    carouselState[id] = 0;
+    setInterval(function() { moveCarousel(id, 1); }, 4000 + Math.random() * 1000);
+  });
+
+  // Scroll animations
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
       if (entry.isIntersecting) {
         entry.target.style.animation = 'fadeInUp 0.7s ease-out forwards';
         observer.unobserve(entry.target);
@@ -1150,4 +1282,10 @@ body::before {
     });
   }, { threshold: 0.1 });
 
-  document.querySelectorAll('.principle-item, .platform-card, .arch-item, .proce
+  document.querySelectorAll('.principle-item, .platform-card, .arch-item, .process-step, .custom-dev-content, .code-block').forEach(function(el) {
+    el.style.opacity = '0';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
